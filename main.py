@@ -198,9 +198,9 @@ def load_data():
         
 def plot():
     global canvas, ax     
-# Get initial thresholds from the data: max value of Vic and Fam columns where their respective flags are 0
-    initial_vic_threshold = df[df['vicP'] == 1]['Vic'].min()  # Max VIC where vicP is 0
-    initial_fam_threshold = df[df['famP'] == 1]['Fam'].min()  # Max FAM where famP is 0
+
+    initial_vic_threshold = df[df['vicP'] == 1]['Vic'].min() 
+    initial_fam_threshold = df[df['famP'] == 1]['Fam'].min()  
         
     # Set initial threshold values in the entry boxes
     vic_entry.delete(0, 'end')
@@ -255,14 +255,14 @@ def save_concentrations():
     date_str = file_name.split('_')[0]
     file_date = datetime.strptime(date_str, '%y%m%d').strftime('%d %B %Y')
 
-    # Prompt the user to select an existing file to update
+    # Prompt the user to select an existing file
     save_path = filedialog.askopenfilename(
         defaultextension=".csv",
         filetypes=[("CSV files", "*.csv")],
         title="Select File to Update"
     )
 
-    # Exit if no file is chosen
+    
     if not save_path:
         messagebox.showinfo("Cancelled", "Operation cancelled.")
         return
@@ -277,11 +277,11 @@ def save_concentrations():
         'Copies/microliter (VIC)': [copiesVIC]
     })
 
-    # Try to read and write the file, handling potential file lock issues
+   
     try:
         # Check if the file exists
         if os.path.exists(save_path):
-            # Read the existing data
+            
             existing_data = pd.read_csv(save_path)
 
             # Check if the file already exists in the data
@@ -293,13 +293,13 @@ def save_concentrations():
                 # Append the new row if the file does not exist
                 existing_data = pd.concat([existing_data, new_data], ignore_index=True)
 
-            # Save the updated data back to the same file
+            
             existing_data.to_csv(save_path, index=False)
         else:
-            # If the file doesn't exist (shouldn't happen here), alert the user
+           
             messagebox.showerror("Error", "The selected file does not exist.")
 
-        # Confirmation message
+        
         messagebox.showinfo("Success", f"Concentrations updated in {save_path}.")
     except PermissionError:
         messagebox.showerror(
@@ -315,9 +315,9 @@ def save_concentrations():
 
 def close_file():
     global fam, rox, vic, com, df, root, ax
-    # Reset the global variables to None
+    
     fam, rox, vic, com, df = None, None, None, None, None
-    # Clear the plot if it exists
+    
     try:
         if ax:
             ax.clear()
@@ -325,7 +325,7 @@ def close_file():
     except NameError:
         pass
 
-     # Clear the threshold entry boxes
+     
     vic_entry.delete(0, 'end')
     fam_entry.delete(0, 'end')
 
@@ -337,10 +337,10 @@ def close_file():
 def main_app():
     global vic_entry, fam_entry, concentration_label, fam, rox, vic, com, df, root, file_label, graph_frame
 
-    # Initialize the main Tkinter window
+    
     root = tk.Tk()
     root.title("dPCR Analyser")
-    root.geometry("1280x720")  # Standard window size
+    root.geometry("1280x720")  
 
     # Menu bar
     menu = Menu(root)
@@ -360,20 +360,20 @@ def main_app():
     root.grid_columnconfigure(0, weight=1)  # Column for the canvas area
     root.grid_columnconfigure(1, weight=0)
 
-    # Create a canvas widget for scrollable window
+    # canvas widget for scrollable window
     canvas = tk.Canvas(root)
     canvas.grid(row=1, column=0, sticky="nsew")
 
-    # Create a scrollbar
+    # scrollbar
     v_scrollbar = tk.Scrollbar(root, orient="vertical", command=canvas.yview)
     v_scrollbar.grid(row=1, column=1, sticky="ns")
 
-     # Create horizontal scrollbar
+     # horizontal scrollbar
     h_scrollbar = tk.Scrollbar(root, orient="horizontal", command=canvas.xview)
     h_scrollbar.grid(row=2, column=0, sticky="ew")
 
     canvas.config(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
-    # Create a frame inside the canvas to hold all widgets
+    # frame inside the canvas to hold all widgets
     main_frame = tk.Frame(canvas)
     canvas.create_window((0, 0), window=main_frame, anchor="nw")
 
@@ -386,11 +386,11 @@ def main_app():
 
    
 
-    # File label
+    
     file_label = Label(main_frame, text="No file selected")
     file_label.grid(row=0, column=1, pady=10, sticky="n")
 
-    # Plot/Visualize button
+    
     plot_button = Button(main_frame, text="Visualize", command=plot)
     plot_button.grid(row=1, column=1, pady=10)
 
@@ -400,7 +400,7 @@ def main_app():
     graph_frame.grid(row=2, column=0, padx=20, pady=10)
     graph_frame.grid_propagate(False)  # Prevent resizing of the graph frame
 
-    # FAM and VIC thresholds
+    
     thresholds_frame = tk.Frame(main_frame)
     thresholds_frame.grid(row=2, column=2, padx=20, pady=10, sticky="ne")
 
@@ -412,33 +412,33 @@ def main_app():
     fam_entry = Entry(thresholds_frame, width=15)
     fam_entry.grid(row=1, column=1, padx=5, pady=5)
 
-    # Apply Thresholds button
+    
     apply_button = Button(thresholds_frame, text="Apply Thresholds", command=lambda: update_plot(float(vic_entry.get()), float(fam_entry.get())))
     apply_button.grid(row=2, column=0, columnspan=2, pady=10)
 
-    # Calculate Concentrations button
+    
     calculate_button = Button(main_frame, text="Calculate Copies", command=calculate)
     calculate_button.grid(row=3, column=0, pady=10)
 
-    # Concentration label
+   
     concentration_label = Label(main_frame, text="")
     concentration_label.grid(row=4, column=0, pady=10)
 
-    # Save button
+    
     save_button = Button(main_frame, text="Save", command=save_concentrations)
     save_button.grid(row=5, column=0, pady=10)
 
     def on_close():
    
-        root.quit()  # Stop Tkinter mainloop
-        root.destroy()  # Destroy the window and free resources
+        root.quit()  
+        root.destroy()  
     
 
 
     root.protocol("WM_DELETE_WINDOW", on_close)
-    # Start the Tkinter main loop
+    
     root.mainloop()
 
-# Start the application
+
 if __name__ == "__main__":
     main_app()
